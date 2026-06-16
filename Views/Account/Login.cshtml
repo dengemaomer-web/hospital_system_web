@@ -30,7 +30,7 @@
                 <div class="alert-inline success">@TempData["Success"]</div>
             }
 
-            <form asp-action="Login" method="post">
+            <form asp-action="Login" method="post" autocomplete="off">
                 <div asp-validation-summary="ModelOnly" class="validation-summary-errors" style="margin-bottom:14px"></div>
 
                 <div class="role-tabs">
@@ -112,12 +112,20 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        function syncRoleTabs() {
+            document.querySelectorAll(".role-tab").forEach(function (t) {
+                t.classList.toggle("active", t.querySelector("input").checked);
+            });
+        }
         document.querySelectorAll(".role-tab").forEach(function (tab) {
             tab.addEventListener("click", function () {
-                document.querySelectorAll(".role-tab").forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
+                document.querySelectorAll(".role-tab input").forEach(i => i.checked = false);
                 tab.querySelector("input").checked = true;
+                syncRoleTabs();
             });
         });
+        // Keep the highlighted tab in sync with the actual checked radio (handles bfcache/form-restore)
+        window.addEventListener("pageshow", syncRoleTabs);
+        syncRoleTabs();
     </script>
 }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HospitalSystem.Models.Enums;
 
 public enum UserRole
@@ -9,8 +11,11 @@ public enum UserRole
 
 public enum Gender
 {
+    [Display(Name = "Belirtilmedi")]
     Unspecified = 0,
+    [Display(Name = "Erkek")]
     Male = 1,
+    [Display(Name = "Kadın")]
     Female = 2
 }
 
