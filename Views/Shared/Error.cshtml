@@ -1,0 +1,17 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Hata";
+    Layout = "_AuthLayout";
+}
+<div style="min-height:100vh;display:grid;place-items:center;background:var(--bg)">
+    <div class="auth-card" style="text-align:center">
+        <div class="stat-icon bg-danger-soft" style="margin:0 auto 18px"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h2>Bir hata oluştu</h2>
+        <p class="subtitle">İsteğiniz işlenirken beklenmeyen bir sorun yaşandı.</p>
+        @if (Model.ShowRequestId)
+        {
+            <p class="text-secondary">İstek No: <code>@Model.RequestId</code></p>
+        }
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-block">Ana Sayfaya Dön</a>
+    </div>
+</div>

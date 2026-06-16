@@ -1,0 +1,35 @@
+@model List<User>
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    string RoleTr(UserRole r) => r switch { UserRole.Admin => "Yönetici", UserRole.Doctor => "Doktor", _ => "Hasta" };
+}
+<div class="page-head"><div><h1>Kullanıcı Yönetimi</h1><div class="crumb">Tüm sistem kullanıcıları</div></div></div>
+
+<div class="card-glass">
+    <div class="table-wrap">
+        <table class="data">
+            <thead><tr><th>Ad Soyad</th><th>TC Kimlik</th><th>Rol</th><th>E-posta</th><th>Son Giriş</th><th>Durum</th><th>İşlem</th></tr></thead>
+            <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td><strong>@u.FullName</strong></td>
+                    <td>@u.TcKimlikNo</td>
+                    <td><span class="badge badge-confirmed">@RoleTr(u.Role)</span></td>
+                    <td>@u.Email</td>
+                    <td>@(u.LastLoginAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "-")</td>
+                    <td><span class="badge @(u.IsActive ? "badge-completed" : "badge-cancelled")">@(u.IsActive ? "Aktif" : "Pasif")</span></td>
+                    <td>
+                        <form asp-action="ToggleUser" method="post" style="margin:0">
+                            @Html.AntiForgeryToken()<input type="hidden" name="id" value="@u.Id" />
+                            <button class="btn btn-sm @(u.IsActive ? "btn-danger" : "btn-success")">
+                                <i class="fa-solid fa-@(u.IsActive ? "ban" : "check")"></i> @(u.IsActive ? "Pasifleştir" : "Aktifleştir")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,131 @@
+@model LoginDto
+@{
+    ViewData["Title"] = "Giriş";
+    Layout = "_AuthLayout";
+}
+<div class="auth-wrapper">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <div class="logo-badge"><i class="fa-solid fa-heart-pulse"></i></div>
+            MediCare
+        </div>
+        <div class="auth-hero">
+            <h1>Hastane Randevu ve Hasta Takip Sistemi</h1>
+            <p>Modern, hızlı ve güvenli sağlık yönetim platformu. Randevularınızı yönetin, reçetelerinize ulaşın, sağlığınızı tek panelden takip edin.</p>
+        </div>
+        <div class="auth-stats">
+            <div class="auth-stat"><div class="num">12K+</div><div class="label">Aktif Hasta</div></div>
+            <div class="auth-stat"><div class="num">320+</div><div class="label">Uzman Doktor</div></div>
+            <div class="auth-stat"><div class="num">%99.9</div><div class="label">Hizmet Süresi</div></div>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-card">
+            <h2>Tekrar Hoş Geldiniz</h2>
+            <p class="subtitle">Devam etmek için giriş yapın</p>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert-inline success">@TempData["Success"]</div>
+            }
+
+            <form asp-action="Login" method="post" autocomplete="off">
+                <div asp-validation-summary="ModelOnly" class="validation-summary-errors" style="margin-bottom:14px"></div>
+
+                <div class="role-tabs">
+                    <label class="role-tab active" data-role="Patient">
+                        <input type="radio" asp-for="Role" value="Patient" checked hidden />
+                        <i class="fa-solid fa-user"></i>Hasta
+                    </label>
+                    <label class="role-tab" data-role="Doctor">
+                        <input type="radio" asp-for="Role" value="Doctor" hidden />
+                        <i class="fa-solid fa-user-doctor"></i>Doktor
+                    </label>
+                    <label class="role-tab" data-role="Admin">
+                        <input type="radio" asp-for="Role" value="Admin" hidden />
+                        <i class="fa-solid fa-user-shield"></i>Admin
+                    </label>
+                </div>
+
+                <div class="field">
+                    <label asp-for="TcKimlikNo"></label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-id-card lead-icon"></i>
+                        <input asp-for="TcKimlikNo" class="form-input" maxlength="11" placeholder="11 haneli TC Kimlik No" autocomplete="username" />
+                    </div>
+                    <span asp-validation-for="TcKimlikNo" class="field-validation-error"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Password"></label>
+                    <div class="input-wrap">
+                        <input asp-for="Password" type="password" class="form-input" placeholder="Şifreniz" autocomplete="current-password" style="padding-left:14px" />
+                        <button type="button" class="toggle-pass" onclick="togglePassword(this)"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <span asp-validation-for="Password" class="field-validation-error"></span>
+                </div>
+
+                <div class="form-row-between">
+                    <label class="checkbox-inline">
+                        <input asp-for="RememberMe" type="checkbox" /> Beni Hatırla
+                    </label>
+                    <a href="#" onclick="openModal('forgot-modal');return false;">Şifremi Unuttum</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+                </button>
+            </form>
+
+            <p class="text-secondary" style="text-align:center;margin-top:20px;margin-bottom:0">
+                Hesabınız yok mu? <a asp-action="Register">Hasta Kaydı Oluştur</a>
+            </p>
+
+            <div class="card-glass" style="margin-top:22px;padding:14px;font-size:.8rem">
+                <strong>Demo Hesaplar</strong>
+                <div class="text-secondary" style="margin-top:6px;line-height:1.7">
+                    Admin: <code>11111111110</code> / <code>Admin123!</code><br />
+                    Doktor: <code>12345678950</code> / <code>Doktor123!</code><br />
+                    Hasta: <code>10000000014</code> / <code>Hasta123!</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="forgot-modal">
+    <div class="modal-card">
+        <h3>Şifremi Unuttum</h3>
+        <p class="text-secondary">Lütfen sistem yöneticisi ile iletişime geçin veya kayıtlı e-posta adresinize sıfırlama bağlantısı talep edin.</p>
+        <div class="field">
+            <label>E-posta</label>
+            <input class="form-input" placeholder="ornek@hastane.com" />
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('forgot-modal')">Kapat</button>
+            <button class="btn btn-primary" onclick="showToast('Sıfırlama bağlantısı gönderildi.','success');closeModal('forgot-modal')">Gönder</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function syncRoleTabs() {
+            document.querySelectorAll(".role-tab").forEach(function (t) {
+                t.classList.toggle("active", t.querySelector("input").checked);
+            });
+        }
+        document.querySelectorAll(".role-tab").forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                document.querySelectorAll(".role-tab input").forEach(i => i.checked = false);
+                tab.querySelector("input").checked = true;
+                syncRoleTabs();
+            });
+        });
+        // Keep the highlighted tab in sync with the actual checked radio (handles bfcache/form-restore)
+        window.addEventListener("pageshow", syncRoleTabs);
+        syncRoleTabs();
+    </script>
+}

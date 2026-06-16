@@ -1,0 +1,130 @@
+@model BookAppointmentViewModel
+@{
+    ViewData["Title"] = "Randevu Al";
+}
+<div class="page-head">
+    <div>
+        <h1>Randevu Al</h1>
+        <div class="crumb">Poliklinik, doktor, tarih ve saat seçerek randevunuzu oluşturun</div>
+    </div>
+</div>
+
+<div class="steps">
+    <div class="step active"><span class="num">1</span> Poliklinik</div>
+    <div class="step active"><span class="num">2</span> Doktor</div>
+    <div class="step active"><span class="num">3</span> Tarih</div>
+    <div class="step active"><span class="num">4</span> Saat</div>
+    <div class="step active"><span class="num">5</span> Onay</div>
+</div>
+
+<form asp-action="Book" method="post" id="book-form">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SelectedSlot" id="SelectedSlot" />
+
+    <div class="grid grid-2">
+        <div class="card-glass">
+            <h2 class="card-title"><i class="fa-solid fa-building c-primary"></i> Poliklinik & Doktor</h2>
+            <div class="field">
+                <label>Poliklinik</label>
+                <select asp-for="SelectedDepartmentId" id="dept-select" class="form-select">
+                    <option value="">Seçiniz...</option>
+                    @foreach (var d in Model.Departments)
+                    {
+                        <option value="@d.Id" selected="@(Model.SelectedDepartmentId == d.Id)">@d.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="field">
+                <label>Doktor</label>
+                <select asp-for="SelectedDoctorId" id="doctor-select" class="form-select">
+                    <option value="">Önce poliklinik seçiniz...</option>
+                    @foreach (var d in Model.Doctors.Where(x => Model.SelectedDepartmentId == null || x.DepartmentId == Model.SelectedDepartmentId))
+                    {
+                        <option value="@d.Id" selected="@(Model.SelectedDoctorId == d.Id)">@d.Title @d.FullName</option>
+                    }
+                </select>
+            </div>
+            <div class="field">
+                <label>Tarih</label>
+                <input asp-for="SelectedDate" type="date" id="date-input" class="form-input" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="field">
+                <label>Not (opsiyonel)</label>
+                <textarea asp-for="Notes" class="form-textarea" placeholder="Şikayetiniz veya notunuz..."></textarea>
+            </div>
+        </div>
+
+        <div class="card-glass">
+            <h2 class="card-title"><i class="fa-solid fa-clock c-accent"></i> Uygun Saatler</h2>
+            <div id="slots-area">
+                <div class="empty-state"><i class="fa-regular fa-clock"></i><div>Doktor ve tarih seçtiğinizde uygun saatler listelenecek.</div></div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="confirm-btn" style="margin-top:20px" disabled>
+                <i class="fa-solid fa-check"></i> Randevuyu Onayla
+            </button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    const deptSelect = document.getElementById("dept-select");
+    const doctorSelect = document.getElementById("doctor-select");
+    const dateInput = document.getElementById("date-input");
+    const slotsArea = document.getElementById("slots-area");
+    const selectedSlotInput = document.getElementById("SelectedSlot");
+    const confirmBtn = document.getElementById("confirm-btn");
+
+    deptSelect.addEventListener("change", function () {
+        doctorSelect.innerHTML = '<option value="">Yükleniyor...</option>';
+        if (!this.value) { doctorSelect.innerHTML = '<option value="">Önce poliklinik seçiniz...</option>'; return; }
+        fetch('@Url.Action("DoctorsByDepartment")?departmentId=' + this.value)
+            .then(r => r.json())
+            .then(list => {
+                doctorSelect.innerHTML = '<option value="">Seçiniz...</option>';
+                list.forEach(d => {
+                    const o = document.createElement("option");
+                    o.value = d.id; o.textContent = d.name;
+                    doctorSelect.appendChild(o);
+                });
+                clearSlots();
+            });
+    });
+
+    function clearSlots() {
+        slotsArea.innerHTML = '<div class="empty-state"><i class="fa-regular fa-clock"></i><div>Doktor ve tarih seçtiğinizde uygun saatler listelenecek.</div></div>';
+        selectedSlotInput.value = ""; confirmBtn.disabled = true;
+    }
+
+    function loadSlots() {
+        if (!doctorSelect.value || !dateInput.value) return;
+        slotsArea.innerHTML = '<div class="spinner"></div>';
+        fetch('@Url.Action("Slots")?doctorId=' + doctorSelect.value + '&date=' + dateInput.value)
+            .then(r => r.json())
+            .then(slots => {
+                if (!slots.length) {
+                    slotsArea.innerHTML = '<div class="empty-state"><i class="fa-solid fa-ban"></i><div>Seçilen gün için uygun saat bulunamadı.</div></div>';
+                    return;
+                }
+                const grid = document.createElement("div");
+                grid.className = "slot-grid";
+                slots.forEach(s => {
+                    const el = document.createElement("div");
+                    el.className = "slot"; el.textContent = s;
+                    el.addEventListener("click", function () {
+                        document.querySelectorAll(".slot.selected").forEach(x => x.classList.remove("selected"));
+                        el.classList.add("selected");
+                        selectedSlotInput.value = s; confirmBtn.disabled = false;
+                    });
+                    grid.appendChild(el);
+                });
+                slotsArea.innerHTML = "";
+                slotsArea.appendChild(grid);
+            });
+    }
+
+    doctorSelect.addEventListener("change", loadSlots);
+    dateInput.addEventListener("change", loadSlots);
+    if (doctorSelect.value && dateInput.value) loadSlots();
+</script>
+}

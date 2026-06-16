@@ -1,0 +1,18 @@
+@model User
+@{
+    ViewData["Title"] = "Profilim";
+    var name = Model?.FullName ?? "Yönetici";
+    var initials = string.Join("", name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[0]));
+}
+<div class="page-head"><div><h1>Profilim</h1><div class="crumb">Yönetici hesap bilgileri</div></div></div>
+
+<div class="card-glass" style="max-width:520px;text-align:center">
+    <div class="avatar" style="width:90px;height:90px;font-size:2rem;margin:10px auto 16px">@initials.ToUpper()</div>
+    <h3 style="margin:0">@name</h3>
+    <div class="text-secondary">@(Model?.Email)</div>
+    <div style="margin-top:20px;text-align:left">
+        <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">TC Kimlik</span><strong>@(Model?.TcKimlikNo)</strong></div>
+        <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">Rol</span><strong>Yönetici</strong></div>
+        <div class="flex justify-between" style="padding:10px 0"><span class="text-secondary">Son Giriş</span><strong>@(Model?.LastLoginAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "-")</strong></div>
+    </div>
+</div>

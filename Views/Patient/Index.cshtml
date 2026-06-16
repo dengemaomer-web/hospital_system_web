@@ -1,0 +1,65 @@
+@model PatientDashboardViewModel
+@{
+    ViewData["Title"] = "Hasta Paneli";
+}
+<div class="page-head">
+    <div>
+        <h1>Merhaba, @Model.Patient.FullName 👋</h1>
+        <div class="crumb">Sağlık panelinize hoş geldiniz</div>
+    </div>
+    <a asp-action="Book" class="btn btn-primary"><i class="fa-solid fa-calendar-plus"></i> Yeni Randevu Al</a>
+</div>
+
+<partial name="_StatCards" model="Model.Stats" />
+
+<div class="grid grid-2-1">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-calendar-day c-primary"></i> Yaklaşan Randevular</h2>
+        @if (Model.UpcomingAppointments.Count == 0)
+        {
+            <div class="empty-state"><i class="fa-regular fa-calendar"></i><div>Yaklaşan randevunuz yok.</div></div>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table class="data">
+                    <thead><tr><th>Doktor</th><th>Poliklinik</th><th>Tarih</th><th>Saat</th><th>Durum</th></tr></thead>
+                    <tbody>
+                    @foreach (var a in Model.UpcomingAppointments)
+                    {
+                        <tr>
+                            <td>@a.DoctorName</td>
+                            <td>@a.DepartmentName</td>
+                            <td>@a.Date.ToString("dd.MM.yyyy")</td>
+                            <td>@a.TimeSlot</td>
+                            <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-prescription c-success"></i> Son Reçeteler</h2>
+        @if (Model.ActivePrescriptions.Count == 0)
+        {
+            <div class="empty-state"><i class="fa-solid fa-prescription-bottle-medical"></i><div>Reçeteniz yok.</div></div>
+        }
+        else
+        {
+            foreach (var p in Model.ActivePrescriptions)
+            {
+                <div class="list-avatar" style="margin-bottom:14px">
+                    <div class="avatar bg-success-soft" style="background:rgba(34,197,94,.14);color:var(--success)"><i class="fa-solid fa-pills"></i></div>
+                    <div class="meta">
+                        <div class="n">@p.DiagnosisName</div>
+                        <div class="s">@p.Items.Count ilaç • @p.Date.ToLocalTime().ToString("dd.MM.yyyy")</div>
+                    </div>
+                </div>
+            }
+            <a asp-action="Prescriptions" class="btn btn-soft btn-block">Tümünü Gör</a>
+        }
+    </div>
+</div>

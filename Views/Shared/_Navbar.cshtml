@@ -1,0 +1,87 @@
+@using HospitalSystem.Models.Enums
+@{
+    var unread = (int)(ViewBag.UnreadCount ?? 0);
+    var recent = ViewBag.RecentNotifications as List<Notification> ?? new List<Notification>();
+    var fullName = (ViewBag.FullName as string) ?? User.GetFullName();
+    var role = (UserRole)(ViewBag.Role ?? User.GetRole());
+    var roleLabel = role switch { UserRole.Admin => "Yönetici", UserRole.Doctor => "Doktor", _ => "Hasta" };
+    var initials = string.Join("", fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[0]));
+    var notifController = role.ToString();
+}
+<header class="navbar">
+    <button class="menu-toggle" onclick="toggleSidebar()" title="Menü"><i class="fa-solid fa-bars"></i></button>
+
+    <div class="global-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Genelde ara... (hasta, doktor, randevu)" />
+    </div>
+
+    <div class="navbar-right">
+        <button class="icon-btn" onclick="toggleTheme()" title="Tema Değiştir">
+            <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+
+        <div class="dropdown">
+            <button class="icon-btn" onclick="toggleDropdown('notif-dd', event)" title="Bildirimler">
+                <i class="fa-solid fa-bell"></i>
+                @if (unread > 0)
+                {
+                    <span class="badge-dot">@unread</span>
+                }
+            </button>
+            <div class="dropdown-menu-custom" id="notif-dd">
+                <div class="dropdown-head">
+                    <span>Bildirimler</span>
+                    <form asp-controller="Notification" asp-action="MarkAllRead" method="post" style="margin:0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-soft">Tümünü Oku</button>
+                    </form>
+                </div>
+                @if (recent.Count == 0)
+                {
+                    <div class="empty-state" style="padding:24px"><i class="fa-regular fa-bell-slash"></i><div>Bildirim yok</div></div>
+                }
+                else
+                {
+                    foreach (var n in recent)
+                    {
+                        <a class="dropdown-item-custom @(n.IsRead ? "" : "unread")" asp-controller="@notifController" asp-action="Notifications">
+                            <div class="ico"><i class="fa-solid fa-circle-info"></i></div>
+                            <div>
+                                <div class="t">@n.Title</div>
+                                <div class="d">@n.Message</div>
+                            </div>
+                        </a>
+                    }
+                }
+                <a class="dropdown-item-custom" asp-controller="@notifController" asp-action="Notifications" style="justify-content:center;color:var(--primary)">Tümünü Gör</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <div class="user-chip" onclick="toggleDropdown('user-dd', event)">
+                <div class="avatar">@initials.ToUpper()</div>
+                <div>
+                    <div class="uname">@fullName</div>
+                    <div class="urole">@roleLabel</div>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="font-size:.7rem;color:var(--text-secondary)"></i>
+            </div>
+            <div class="dropdown-menu-custom sm" id="user-dd">
+                <a class="dropdown-item-custom" asp-controller="@notifController" asp-action="Profile">
+                    <div class="ico"><i class="fa-solid fa-user"></i></div><div class="t">Profilim</div>
+                </a>
+                <a class="dropdown-item-custom" asp-controller="@notifController" asp-action="Notifications">
+                    <div class="ico"><i class="fa-solid fa-bell"></i></div><div class="t">Bildirimler</div>
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="dropdown-item-custom" style="width:100%;border:none;background:none;cursor:pointer;color:var(--danger)">
+                        <div class="ico" style="background:rgba(239,68,68,.12);color:var(--danger)"><i class="fa-solid fa-right-from-bracket"></i></div>
+                        <div class="t">Çıkış Yap</div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>

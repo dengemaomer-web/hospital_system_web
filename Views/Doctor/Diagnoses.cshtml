@@ -1,0 +1,22 @@
+@model List<Diagnosis>
+@{
+    ViewData["Title"] = "Tanı & İlaç Önerileri";
+}
+<div class="page-head"><div><h1>Tanı & İlaç Önerileri</h1><div class="crumb">Akıllı ilaç öneri sisteminin tanı veritabanı</div></div></div>
+
+<div class="grid grid-3">
+    @foreach (var d in Model)
+    {
+        <div class="card-glass">
+            <h2 class="card-title"><i class="fa-solid fa-notes-medical c-accent"></i> @d.Name</h2>
+            <p class="text-secondary" style="margin-top:-8px">@d.Description</p>
+            <div class="nav-label" style="padding-left:0">Önerilen İlaçlar</div>
+            <div class="flex gap-2 flex-wrap">
+                @foreach (var m in d.RecommendedMedicines)
+                {
+                    <span class="badge badge-confirmed"><i class="fa-solid fa-capsules"></i> @m</span>
+                }
+            </div>
+        </div>
+    }
+</div>

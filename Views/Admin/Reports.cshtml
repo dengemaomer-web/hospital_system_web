@@ -1,0 +1,58 @@
+@model ReportsViewModel
+@{
+    ViewData["Title"] = "Raporlar";
+}
+<div class="page-head">
+    <div><h1>Raporlar</h1><div class="crumb">Detaylı istatistik ve grafikler</div></div>
+    <a asp-action="Backup" class="btn btn-soft"><i class="fa-solid fa-download"></i> JSON Yedek İndir</a>
+</div>
+
+<div class="grid grid-2" style="margin-bottom:18px">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-chart-column c-primary"></i> Aylık Randevu</h2>
+        <canvas id="monthly" height="130"></canvas>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-chart-pie c-accent"></i> Poliklinik Yoğunluğu</h2>
+        <canvas id="dept" height="130"></canvas>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-user-doctor c-success"></i> Doktor Performansı</h2>
+        <canvas id="doctor" height="130"></canvas>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-chart-simple c-warning"></i> Randevu Durumları</h2>
+        <canvas id="status" height="130"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const grid = getComputedStyle(document.documentElement).getPropertyValue('--border');
+    const palette = ['#2563EB','#06B6D4','#22C55E','#F59E0B','#EF4444','#8B5CF6'];
+    new Chart(document.getElementById('monthly'), {
+        type: 'bar',
+        data: { labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthLabels)),
+            datasets: [{ label: 'Randevu', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyAppointments)), backgroundColor: '#2563EB', borderRadius: 8 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: grid } }, x: { grid: { display: false } } } }
+    });
+    new Chart(document.getElementById('dept'), {
+        type: 'doughnut',
+        data: { labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentLabels)),
+            datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentLoads)), backgroundColor: palette }] },
+        options: { plugins: { legend: { position: 'right' } }, cutout: '60%' }
+    });
+    new Chart(document.getElementById('doctor'), {
+        type: 'bar',
+        data: { labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DoctorLabels)),
+            datasets: [{ label: 'Tamamlanan', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DoctorPerformance)), backgroundColor: '#06B6D4', borderRadius: 8 }] },
+        options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: grid } }, y: { grid: { display: false } } } }
+    });
+    new Chart(document.getElementById('status'), {
+        type: 'polarArea',
+        data: { labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusLabels)),
+            datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusCounts)), backgroundColor: palette }] },
+        options: { plugins: { legend: { position: 'right' } } }
+    });
+</script>
+}

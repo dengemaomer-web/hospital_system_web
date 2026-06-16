@@ -1,0 +1,36 @@
+@model Doctor
+@{
+    ViewData["Title"] = "Profilim";
+    var dept = ViewBag.Department as Department;
+    var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(p => p[0]));
+}
+<div class="page-head"><div><h1>Profilim</h1><div class="crumb">Hekim profil bilgileriniz</div></div></div>
+
+<div class="grid grid-2-1">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-user-pen c-primary"></i> Bilgilerim</h2>
+        <form asp-action="Profile" method="post">
+            @Html.AntiForgeryToken()
+            <div class="grid grid-2">
+                <div class="field"><label>Ad Soyad</label><input class="form-input" value="@Model.FullName" disabled /></div>
+                <div class="field"><label>Unvan</label><input asp-for="Title" class="form-input" /></div>
+                <div class="field"><label>E-posta</label><input asp-for="Email" class="form-input" /></div>
+                <div class="field"><label>Telefon</label><input asp-for="Phone" class="form-input" /></div>
+                <div class="field" style="grid-column:1/-1"><label>Hakkımda</label><textarea asp-for="Bio" class="form-textarea"></textarea></div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
+        </form>
+    </div>
+    <div class="card-glass" style="text-align:center">
+        <div class="avatar" style="width:90px;height:90px;font-size:2rem;margin:10px auto 16px">@initials.ToUpper()</div>
+        <h3 style="margin:0">@Model.Title @Model.FullName</h3>
+        <div class="text-secondary">@(dept?.Name ?? "-")</div>
+        <div class="stars" style="margin:12px 0">
+            @for (var i = 1; i <= 5; i++)
+            {
+                <i class="fa-@(i <= Math.Round(Model.Rating) ? "solid" : "regular") fa-star"></i>
+            }
+            <span class="text-secondary" style="font-size:.8rem">@Model.Rating (@Model.RatingCount değerlendirme)</span>
+        </div>
+    </div>
+</div>

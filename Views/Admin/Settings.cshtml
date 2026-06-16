@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Sistem Ayarları";
+}
+<div class="page-head"><div><h1>Sistem Ayarları</h1><div class="crumb">Genel sistem yapılandırması ve yedekleme</div></div></div>
+
+<div class="grid grid-2">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-database c-primary"></i> Yedekleme</h2>
+        <p class="text-secondary">Tüm JSON veri dosyalarını tek bir ZIP arşivi olarak indirin.</p>
+        <a asp-action="Backup" class="btn btn-primary"><i class="fa-solid fa-download"></i> JSON Yedek İndir</a>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-palette c-accent"></i> Görünüm</h2>
+        <p class="text-secondary">Aydınlık / karanlık tema tercihi cihazınızda saklanır.</p>
+        <button class="btn btn-soft" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i> Tema Değiştir</button>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-globe c-success"></i> Dil Desteği</h2>
+        <p class="text-secondary">Sistem dili</p>
+        <select class="form-select" style="max-width:240px">
+            <option>Türkçe</option>
+            <option>English</option>
+        </select>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-shield-halved c-warning"></i> Güvenlik</h2>
+        <p class="text-secondary">Şifreler PBKDF2 (SHA-256, 100.000 iterasyon) ile saklanır. Oturumlar çerez tabanlıdır.</p>
+    </div>
+</div>

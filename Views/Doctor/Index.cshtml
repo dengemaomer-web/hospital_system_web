@@ -1,0 +1,48 @@
+@model DoctorDashboardViewModel
+@{
+    ViewData["Title"] = "Doktor Paneli";
+}
+<div class="page-head">
+    <div>
+        <h1>Hoş geldiniz, @Model.Doctor.Title @Model.Doctor.FullName</h1>
+        <div class="crumb">Bugünün özeti ve randevularınız</div>
+    </div>
+    <a asp-action="Appointments" class="btn btn-primary"><i class="fa-solid fa-calendar-day"></i> Günlük Randevular</a>
+</div>
+
+<partial name="_StatCards" model="Model.Stats" />
+
+<div class="card-glass">
+    <h2 class="card-title"><i class="fa-solid fa-calendar-day c-primary"></i> Bugünkü Randevular</h2>
+    @if (Model.TodayAppointments.Count == 0)
+    {
+        <div class="empty-state"><i class="fa-regular fa-calendar"></i><div>Bugün için randevunuz yok.</div></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data">
+                <thead><tr><th>Saat</th><th>Hasta</th><th>Durum</th><th>İşlemler</th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.TodayAppointments)
+                {
+                    <tr>
+                        <td><strong>@a.TimeSlot</strong></td>
+                        <td>@a.PatientName</td>
+                        <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        <td>
+                            <div class="flex gap-2">
+                                <a asp-action="PatientHistory" asp-route-id="@a.PatientId" class="btn btn-sm btn-soft"><i class="fa-solid fa-clock-rotate-left"></i> Geçmiş</a>
+                                @if (a.Status != AppointmentStatus.Completed)
+                                {
+                                    <a asp-action="WritePrescription" asp-route-appointmentId="@a.Id" class="btn btn-sm btn-primary"><i class="fa-solid fa-prescription"></i> Reçete</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

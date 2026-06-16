@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Erişim Engellendi";
+    Layout = "_AuthLayout";
+}
+<div style="min-height:100vh;display:grid;place-items:center;background:var(--bg)">
+    <div class="auth-card" style="text-align:center">
+        <div class="stat-icon bg-danger-soft" style="margin:0 auto 18px"><i class="fa-solid fa-lock"></i></div>
+        <h2>Erişim Engellendi</h2>
+        <p class="subtitle">Bu sayfayı görüntüleme yetkiniz bulunmuyor.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-block">Ana Sayfaya Dön</a>
+    </div>
+</div>

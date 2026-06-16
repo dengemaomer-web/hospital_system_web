@@ -1,0 +1,85 @@
+@model RegisterDto
+@{
+    ViewData["Title"] = "Kayıt";
+    Layout = "_AuthLayout";
+}
+<div class="auth-wrapper">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <div class="logo-badge"><i class="fa-solid fa-heart-pulse"></i></div>
+            MediCare
+        </div>
+        <div class="auth-hero">
+            <h1>Aramıza Katılın</h1>
+            <p>Hasta hesabınızı oluşturun ve sağlık hizmetlerine anında erişin. Randevu alın, reçetelerinizi görüntüleyin.</p>
+        </div>
+        <div class="auth-stats">
+            <div class="auth-stat"><div class="num">7/24</div><div class="label">Online Randevu</div></div>
+            <div class="auth-stat"><div class="num">Hızlı</div><div class="label">Kayıt İşlemi</div></div>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <div class="auth-card">
+            <h2>Hasta Kaydı</h2>
+            <p class="subtitle">Bilgilerinizi girerek hesap oluşturun</p>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="validation-summary-errors" style="margin-bottom:14px"></div>
+
+                <div class="field">
+                    <label asp-for="FullName"></label>
+                    <input asp-for="FullName" class="form-input" placeholder="Ad Soyad" />
+                    <span asp-validation-for="FullName" class="field-validation-error"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="TcKimlikNo"></label>
+                    <input asp-for="TcKimlikNo" class="form-input" maxlength="11" placeholder="TC Kimlik No" />
+                    <span asp-validation-for="TcKimlikNo" class="field-validation-error"></span>
+                </div>
+                <div class="grid grid-2">
+                    <div class="field">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-input" placeholder="E-posta" />
+                        <span asp-validation-for="Email" class="field-validation-error"></span>
+                    </div>
+                    <div class="field">
+                        <label asp-for="Phone"></label>
+                        <input asp-for="Phone" class="form-input" placeholder="Telefon" />
+                    </div>
+                </div>
+                <div class="grid grid-2">
+                    <div class="field">
+                        <label asp-for="BirthDate"></label>
+                        <input asp-for="BirthDate" type="date" class="form-input" />
+                    </div>
+                    <div class="field">
+                        <label asp-for="Gender"></label>
+                        <select asp-for="Gender" class="form-select" asp-items="Html.GetEnumSelectList<Gender>()"></select>
+                    </div>
+                </div>
+                <div class="grid grid-2">
+                    <div class="field">
+                        <label asp-for="Password"></label>
+                        <input asp-for="Password" type="password" class="form-input" placeholder="Şifre" />
+                        <span asp-validation-for="Password" class="field-validation-error"></span>
+                    </div>
+                    <div class="field">
+                        <label asp-for="ConfirmPassword"></label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-input" placeholder="Şifre Tekrar" />
+                        <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-user-plus"></i> Kayıt Ol</button>
+            </form>
+            <p class="text-secondary" style="text-align:center;margin-top:20px;margin-bottom:0">
+                Zaten hesabınız var mı? <a asp-action="Login">Giriş Yap</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

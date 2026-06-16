@@ -1,0 +1,12 @@
+@model List<StatCard>
+<div class="stat-grid">
+    @foreach (var s in Model)
+    {
+        <div class="stat-card">
+            <div class="stat-glow bg-@(s.Color)-soft"></div>
+            <div class="stat-icon bg-@(s.Color)-soft"><i class="fa-solid @s.Icon"></i></div>
+            <div class="stat-value">@s.Value</div>
+            <div class="stat-title">@s.Title</div>
+        </div>
+    }
+</div>

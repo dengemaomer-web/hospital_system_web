@@ -1,0 +1,53 @@
+@model List<Doctor>
+@{
+    ViewData["Title"] = "Favori Doktorlarım";
+    var departments = ViewBag.Departments as List<Department> ?? new List<Department>();
+    var favIds = ViewBag.FavoriteIds as List<Guid> ?? new List<Guid>();
+}
+<div class="page-head">
+    <div><h1>Doktorlar</h1><div class="crumb">Favori doktorlarınızı yönetin ve değerlendirin</div></div>
+</div>
+
+<div class="doctor-grid">
+    @foreach (var d in Model)
+    {
+        var dept = departments.FirstOrDefault(x => x.Id == d.DepartmentId);
+        var isFav = favIds.Contains(d.Id);
+        var initials = string.Join("", d.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(p => p[0]));
+        <div class="doctor-card">
+            <div class="avatar">@initials.ToUpper()</div>
+            <h3 style="margin:0">@d.Title @d.FullName</h3>
+            <div class="text-secondary" style="margin:4px 0 8px">@(dept?.Name ?? "-")</div>
+            <div class="stars" style="margin-bottom:12px">
+                @for (var i = 1; i <= 5; i++)
+                {
+                    <i class="fa-@(i <= Math.Round(d.Rating) ? "solid" : "regular") fa-star"></i>
+                }
+                <span class="text-secondary" style="font-size:.8rem">(@d.Rating)</span>
+            </div>
+            <div class="flex gap-2" style="justify-content:center">
+                <form asp-action="ToggleFavorite" method="post" style="margin:0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="doctorId" value="@d.Id" />
+                    <button type="submit" class="btn btn-sm @(isFav ? "btn-warning" : "btn-ghost")">
+                        <i class="fa-@(isFav ? "solid" : "regular") fa-star"></i> @(isFav ? "Favori" : "Favori Ekle")
+                    </button>
+                </form>
+                <a asp-action="Book" asp-route-doctorId="@d.Id" class="btn btn-sm btn-primary"><i class="fa-solid fa-calendar-plus"></i> Randevu</a>
+            </div>
+            <form asp-action="RateDoctor" method="post" style="margin-top:12px">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="doctorId" value="@d.Id" />
+                <div class="flex gap-2" style="justify-content:center">
+                    <select name="rating" class="form-select" style="width:auto;padding:6px 10px">
+                        @for (var i = 5; i >= 1; i--)
+                        {
+                            <option value="@i">@i ★</option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-soft">Puan Ver</button>
+                </div>
+            </form>
+        </div>
+    }
+</div>
