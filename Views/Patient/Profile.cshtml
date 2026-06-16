@@ -1,0 +1,36 @@
+@model Patient
+@{
+    ViewData["Title"] = "Profilim";
+    var initials = string.Join("", Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[0]));
+}
+<div class="page-head"><div><h1>Profilim</h1><div class="crumb">Kişisel bilgilerinizi güncelleyin</div></div></div>
+
+<div class="grid grid-2-1">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-user-pen c-primary"></i> Bilgilerim</h2>
+        <form asp-action="Profile" method="post">
+            @Html.AntiForgeryToken()
+            <div class="grid grid-2">
+                <div class="field"><label>Ad Soyad</label><input class="form-input" value="@Model.FullName" disabled /></div>
+                <div class="field"><label>TC Kimlik No</label><input class="form-input" value="@Model.TcKimlikNo" disabled /></div>
+                <div class="field"><label>E-posta</label><input asp-for="Email" class="form-input" /></div>
+                <div class="field"><label>Telefon</label><input asp-for="Phone" class="form-input" /></div>
+                <div class="field"><label>Doğum Tarihi</label><input asp-for="BirthDate" type="date" class="form-input" /></div>
+                <div class="field"><label>Cinsiyet</label><select asp-for="Gender" class="form-select" asp-items="Html.GetEnumSelectList<Gender>()"></select></div>
+                <div class="field"><label>Kan Grubu</label><input asp-for="BloodType" class="form-input" /></div>
+                <div class="field" style="grid-column:1/-1"><label>Adres</label><textarea asp-for="Address" class="form-textarea"></textarea></div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
+        </form>
+    </div>
+    <div class="card-glass" style="text-align:center">
+        <div class="avatar" style="width:90px;height:90px;font-size:2rem;margin:10px auto 16px">@initials.ToUpper()</div>
+        <h3 style="margin:0">@Model.FullName</h3>
+        <div class="text-secondary">@Model.Email</div>
+        <div style="margin-top:20px;text-align:left">
+            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">Kan Grubu</span><strong>@(string.IsNullOrEmpty(Model.BloodType) ? "-" : Model.BloodType)</strong></div>
+            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">Telefon</span><strong>@(string.IsNullOrEmpty(Model.Phone) ? "-" : Model.Phone)</strong></div>
+            <div class="flex justify-between" style="padding:10px 0"><span class="text-secondary">Üyelik</span><strong>@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</strong></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+@using HospitalSystem.Models.Enums
+@{
+    var role = User.GetRole();
+    var ctrl = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+    var action = (ViewContext.RouteData.Values["action"] ?? "").ToString();
+
+    string Active(string c, string a) =>
+        (string.Equals(ctrl, c, StringComparison.OrdinalIgnoreCase) &&
+         string.Equals(action, a, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+
+    (string ctrl, string action, string icon, string label)[] menu = role switch
+    {
+        UserRole.Admin => new[]
+        {
+            ("Admin", "Index", "fa-gauge-high", "Dashboard"),
+            ("Admin", "Users", "fa-users-gear", "Kullanıcı Yönetimi"),
+            ("Admin", "Doctors", "fa-user-doctor", "Doktor Yönetimi"),
+            ("Admin", "Patients", "fa-hospital-user", "Hasta Yönetimi"),
+            ("Admin", "Departments", "fa-building", "Poliklinikler"),
+            ("Admin", "Appointments", "fa-calendar-check", "Randevular"),
+            ("Admin", "Announcements", "fa-bullhorn", "Duyurular"),
+            ("Admin", "Reports", "fa-chart-line", "Raporlar"),
+            ("Admin", "Logs", "fa-list-check", "Log Yönetimi"),
+            ("Admin", "Settings", "fa-gear", "Sistem Ayarları"),
+        },
+        UserRole.Doctor => new[]
+        {
+            ("Doctor", "Index", "fa-gauge-high", "Dashboard"),
+            ("Doctor", "Appointments", "fa-calendar-day", "Günlük Randevular"),
+            ("Doctor", "Patients", "fa-hospital-user", "Hasta Listesi"),
+            ("Doctor", "Diagnoses", "fa-notes-medical", "Tanı & İlaç Önerileri"),
+            ("Doctor", "Schedule", "fa-calendar-week", "Çalışma Takvimi"),
+            ("Doctor", "Notifications", "fa-bell", "Bildirimler"),
+            ("Doctor", "Profile", "fa-user", "Profilim"),
+        },
+        _ => new[]
+        {
+            ("Patient", "Index", "fa-gauge-high", "Dashboard"),
+            ("Patient", "Book", "fa-calendar-plus", "Randevu Al"),
+            ("Patient", "Appointments", "fa-calendar-check", "Randevularım"),
+            ("Patient", "Prescriptions", "fa-prescription", "Reçetelerim"),
+            ("Patient", "LabResults", "fa-flask", "Tahlil Sonuçlarım"),
+            ("Patient", "FavoriteDoctors", "fa-star", "Favori Doktorlarım"),
+            ("Patient", "Notifications", "fa-bell", "Bildirimler"),
+            ("Patient", "Profile", "fa-user", "Profilim"),
+        }
+    };
+}
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-badge"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div class="brand-text">MediCare<small>Hastane Sistemi</small></div>
+    </div>
+    <nav class="nav-section">
+        <div class="nav-label">Menü</div>
+        @foreach (var item in menu)
+        {
+            <a class="nav-link @Active(item.ctrl, item.action)" asp-controller="@item.ctrl" asp-action="@item.action">
+                <i class="fa-solid @item.icon"></i><span>@item.label</span>
+            </a>
+        }
+    </nav>
+    <div class="nav-section" style="flex:0">
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="nav-link" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;color:var(--danger)">
+                <i class="fa-solid fa-right-from-bracket"></i><span>Çıkış Yap</span>
+            </button>
+        </form>
+    </div>
+</aside>

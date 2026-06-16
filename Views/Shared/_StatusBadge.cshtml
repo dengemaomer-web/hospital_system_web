@@ -1,0 +1,12 @@
+@model AppointmentStatus
+@{
+    var (cls, label, icon) = Model switch
+    {
+        AppointmentStatus.Pending => ("badge-pending", "Beklemede", "fa-hourglass-half"),
+        AppointmentStatus.Confirmed => ("badge-confirmed", "Onaylandı", "fa-circle-check"),
+        AppointmentStatus.Completed => ("badge-completed", "Tamamlandı", "fa-clipboard-check"),
+        AppointmentStatus.Cancelled => ("badge-cancelled", "İptal Edildi", "fa-circle-xmark"),
+        _ => ("badge-pending", Model.ToString(), "fa-circle")
+    };
+}
+<span class="badge @cls"><i class="fa-solid @icon"></i> @label</span>

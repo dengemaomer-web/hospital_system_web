@@ -1,0 +1,66 @@
+@model List<Doctor>
+@{
+    ViewData["Title"] = "Doktor Yönetimi";
+    var departments = ViewBag.Departments as List<Department> ?? new List<Department>();
+}
+<div class="page-head">
+    <div><h1>Doktor Yönetimi</h1><div class="crumb">Hekim kayıtları</div></div>
+    <button class="btn btn-primary" onclick="openModal('add-doctor')"><i class="fa-solid fa-plus"></i> Doktor Ekle</button>
+</div>
+
+<div class="card-glass">
+    <div class="table-wrap">
+        <table class="data">
+            <thead><tr><th>Doktor</th><th>Unvan</th><th>Poliklinik</th><th>E-posta</th><th>Puan</th><th>İşlem</th></tr></thead>
+            <tbody>
+            @foreach (var d in Model)
+            {
+                var dept = departments.FirstOrDefault(x => x.Id == d.DepartmentId);
+                <tr>
+                    <td><strong>@d.FullName</strong></td>
+                    <td>@d.Title</td>
+                    <td>@(dept?.Name ?? "-")</td>
+                    <td>@d.Email</td>
+                    <td><span class="stars"><i class="fa-solid fa-star"></i></span> @d.Rating</td>
+                    <td>
+                        <form asp-action="DeleteDoctor" method="post" onsubmit="return confirm('Doktoru silmek istediğinize emin misiniz?');" style="margin:0">
+                            @Html.AntiForgeryToken()<input type="hidden" name="id" value="@d.Id" />
+                            <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-overlay" id="add-doctor">
+    <div class="modal-card">
+        <h3>Yeni Doktor Ekle</h3>
+        <form asp-action="CreateDoctor" method="post">
+            @Html.AntiForgeryToken()
+            <div class="grid grid-2">
+                <div class="field"><label>Ad Soyad</label><input name="fullName" class="form-input" required /></div>
+                <div class="field"><label>TC Kimlik No</label><input name="tcKimlikNo" class="form-input" maxlength="11" required /></div>
+                <div class="field"><label>Unvan</label><input name="title" class="form-input" placeholder="Uzm. Dr." /></div>
+                <div class="field">
+                    <label>Poliklinik</label>
+                    <select name="departmentId" class="form-select" required>
+                        @foreach (var dep in departments)
+                        {
+                            <option value="@dep.Id">@dep.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="field"><label>E-posta</label><input name="email" type="email" class="form-input" /></div>
+                <div class="field"><label>Telefon</label><input name="phone" class="form-input" /></div>
+                <div class="field" style="grid-column:1/-1"><label>Şifre</label><input name="password" class="form-input" placeholder="Boş bırakılırsa Doktor123!" /></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('add-doctor')">İptal</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>

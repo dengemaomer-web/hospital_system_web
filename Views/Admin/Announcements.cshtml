@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Duyurular";
+}
+<div class="page-head"><div><h1>Duyurular</h1><div class="crumb">Tüm kullanıcılara duyuru gönderin</div></div></div>
+
+<div class="grid grid-2-1">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-bullhorn c-warning"></i> Yeni Duyuru</h2>
+        <form asp-action="Announcements" method="post">
+            @Html.AntiForgeryToken()
+            <div class="field"><label>Başlık</label><input name="title" class="form-input" required /></div>
+            <div class="field"><label>Mesaj</label><textarea name="message" class="form-textarea" required></textarea></div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
+        </form>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-circle-info c-primary"></i> Bilgi</h2>
+        <p class="text-secondary">Gönderdiğiniz duyuru tüm aktif kullanıcıların bildirim merkezine anlık olarak iletilir.</p>
+    </div>
+</div>

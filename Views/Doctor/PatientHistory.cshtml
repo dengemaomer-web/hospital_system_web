@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Hasta Geçmişi";
+    var patient = ViewBag.Patient as Patient;
+    var appointments = ViewBag.Appointments as List<AppointmentViewModel> ?? new List<AppointmentViewModel>();
+    var prescriptions = ViewBag.Prescriptions as List<Prescription> ?? new List<Prescription>();
+}
+<div class="page-head">
+    <div><h1>@patient?.FullName</h1><div class="crumb">Hasta geçmişi ve muayene kayıtları</div></div>
+    <a asp-action="Patients" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Geri</a>
+</div>
+
+<div class="grid grid-2-1">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-clock-rotate-left c-primary"></i> Randevu Geçmişi</h2>
+        @if (appointments.Count == 0)
+        {
+            <div class="empty-state"><i class="fa-regular fa-calendar"></i><div>Kayıt yok.</div></div>
+        }
+        else
+        {
+            <table class="data">
+                <thead><tr><th>Tarih</th><th>Saat</th><th>Durum</th></tr></thead>
+                <tbody>
+                @foreach (var a in appointments)
+                {
+                    <tr><td>@a.Date.ToString("dd.MM.yyyy")</td><td>@a.TimeSlot</td><td><partial name="_StatusBadge" model="a.Status" /></td></tr>
+                }
+                </tbody>
+            </table>
+        }
+        <h2 class="card-title" style="margin-top:24px"><i class="fa-solid fa-prescription c-success"></i> Reçeteler</h2>
+        @if (prescriptions.Count == 0)
+        {
+            <div class="empty-state"><i class="fa-solid fa-prescription-bottle-medical"></i><div>Reçete yok.</div></div>
+        }
+        else
+        {
+            foreach (var p in prescriptions)
+            {
+                <div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
+                    <strong>@p.DiagnosisName</strong> <span class="text-secondary">• @p.Date.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                    <div class="text-secondary" style="margin-top:6px">@string.Join(", ", p.Items.Select(i => i.MedicineName))</div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-id-card c-accent"></i> Hasta Bilgileri</h2>
+        @if (patient != null)
+        {
+            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">TC Kimlik</span><strong>@patient.TcKimlikNo</strong></div>
+            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">Doğum Tarihi</span><strong>@patient.BirthDate.ToString("dd.MM.yyyy")</strong></div>
+            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">Cinsiyet</span><strong>@(patient.Gender == Gender.Male ? "Erkek" : patient.Gender == Gender.Female ? "Kadın" : "-")</strong></div>
+            <div class="flex justify-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-secondary">Kan Grubu</span><strong>@(string.IsNullOrEmpty(patient.BloodType) ? "-" : patient.BloodType)</strong></div>
+            <div class="flex justify-between" style="padding:10px 0"><span class="text-secondary">Telefon</span><strong>@(string.IsNullOrEmpty(patient.Phone) ? "-" : patient.Phone)</strong></div>
+        }
+    </div>
+</div>

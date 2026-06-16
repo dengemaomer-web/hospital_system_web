@@ -1,0 +1,93 @@
+@model PrescriptionFormViewModel
+@{
+    ViewData["Title"] = "Reçete Yaz";
+}
+<div class="page-head">
+    <div><h1>Reçete Yaz</h1><div class="crumb">Hasta: <strong>@Model.PatientName</strong></div></div>
+    <a asp-action="Appointments" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Geri</a>
+</div>
+
+<form asp-action="WritePrescription" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="AppointmentId" />
+    <input type="hidden" asp-for="PatientId" />
+
+    <div class="grid grid-2-1">
+        <div class="card-glass">
+            <h2 class="card-title"><i class="fa-solid fa-pills c-primary"></i> İlaçlar</h2>
+            <div id="items">
+                <div class="item-row grid" style="grid-template-columns:2fr 1fr 1fr auto;gap:10px;margin-bottom:10px">
+                    <input name="Items[0].MedicineName" class="form-input" placeholder="İlaç adı" />
+                    <input name="Items[0].Dosage" class="form-input" placeholder="Doz (ör. 500mg)" />
+                    <input name="Items[0].Usage" class="form-input" placeholder="Kullanım (ör. 2x1)" />
+                    <button type="button" class="btn btn-ghost btn-icon" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-soft" onclick="addItem()"><i class="fa-solid fa-plus"></i> İlaç Ekle</button>
+
+            <div class="field" style="margin-top:20px">
+                <label>Notlar</label>
+                <textarea asp-for="Notes" class="form-textarea" placeholder="Reçete notları..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:8px"><i class="fa-solid fa-floppy-disk"></i> Reçeteyi Kaydet</button>
+        </div>
+
+        <div class="card-glass">
+            <h2 class="card-title"><i class="fa-solid fa-brain c-accent"></i> Akıllı İlaç Önerisi</h2>
+            <div class="field">
+                <label>Tanı</label>
+                <select asp-for="DiagnosisName" id="diagnosis-select" class="form-select">
+                    <option value="">Tanı seçiniz...</option>
+                    @foreach (var d in Model.Diagnoses)
+                    {
+                        <option value="@d.Name">@d.Name</option>
+                    }
+                </select>
+            </div>
+            <p class="text-secondary" style="font-size:.85rem">Tanı seçtiğinizde sistem önerilen ilaçları otomatik listeler.</p>
+            <div id="suggestions"></div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    let idx = 1;
+    function addItem(name) {
+        const wrap = document.getElementById("items");
+        const row = document.createElement("div");
+        row.className = "item-row grid";
+        row.style = "grid-template-columns:2fr 1fr 1fr auto;gap:10px;margin-bottom:10px";
+        row.innerHTML =
+            '<input name="Items[' + idx + '].MedicineName" class="form-input" placeholder="İlaç adı" value="' + (name || "") + '">' +
+            '<input name="Items[' + idx + '].Dosage" class="form-input" placeholder="Doz">' +
+            '<input name="Items[' + idx + '].Usage" class="form-input" placeholder="Kullanım">' +
+            '<button type="button" class="btn btn-ghost btn-icon" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>';
+        wrap.appendChild(row);
+        idx++;
+    }
+
+    document.getElementById("diagnosis-select").addEventListener("change", function () {
+        const box = document.getElementById("suggestions");
+        if (!this.value) { box.innerHTML = ""; return; }
+        box.innerHTML = '<div class="spinner"></div>';
+        fetch('@Url.Action("SuggestMedicines")?diagnosis=' + encodeURIComponent(this.value))
+            .then(r => r.json())
+            .then(meds => {
+                if (!meds.length) { box.innerHTML = '<p class="text-secondary">Öneri bulunamadı.</p>'; return; }
+                box.innerHTML = '<div class="nav-label" style="padding-left:0">Önerilen İlaçlar</div>';
+                meds.forEach(m => {
+                    const chip = document.createElement("div");
+                    chip.className = "flex items-center justify-between";
+                    chip.style = "padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px";
+                    chip.innerHTML = '<span><i class="fa-solid fa-capsules c-accent"></i> ' + m + '</span>';
+                    const btn = document.createElement("button");
+                    btn.type = "button"; btn.className = "btn btn-sm btn-soft"; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Ekle';
+                    btn.onclick = function () { addItem(m); showToast(m + ' eklendi','success'); };
+                    chip.appendChild(btn);
+                    box.appendChild(chip);
+                });
+            });
+    });
+</script>
+}

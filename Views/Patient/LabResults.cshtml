@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Tahlil Sonuçlarım";
+    var samples = new[]
+    {
+        ("Hemogram (Tam Kan Sayımı)", "Normal", "completed", "12.06.2026"),
+        ("Açlık Kan Şekeri", "Normal", "completed", "12.06.2026"),
+        ("Vitamin D", "Düşük", "warning", "01.06.2026"),
+        ("Kolesterol Paneli", "Beklemede", "pending", "16.06.2026"),
+    };
+}
+<div class="page-head">
+    <div><h1>Tahlil Sonuçlarım</h1><div class="crumb">Laboratuvar tetkik sonuçlarınız</div></div>
+</div>
+
+<div class="card-glass">
+    <div class="table-wrap">
+        <table class="data">
+            <thead><tr><th>Tetkik</th><th>Sonuç</th><th>Durum</th><th>Tarih</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var s in samples)
+            {
+                <tr>
+                    <td><strong>@s.Item1</strong></td>
+                    <td>@s.Item2</td>
+                    <td><span class="badge badge-@s.Item3">@(s.Item3 == "completed" ? "Sonuçlandı" : s.Item3 == "warning" ? "Dikkat" : "Beklemede")</span></td>
+                    <td>@s.Item4</td>
+                    <td><button class="btn btn-sm btn-soft" onclick="showToast('Detay görüntüleme yakında.','info')"><i class="fa-solid fa-eye"></i></button></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

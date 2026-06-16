@@ -1,0 +1,73 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+}
+<div class="page-head">
+    <div><h1>Yönetim Paneli</h1><div class="crumb">Sistem geneli özet ve istatistikler</div></div>
+    <a asp-action="Reports" class="btn btn-primary"><i class="fa-solid fa-chart-line"></i> Detaylı Raporlar</a>
+</div>
+
+<partial name="_StatCards" model="Model.Stats" />
+
+<div class="grid grid-2" style="margin-bottom:18px">
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-chart-column c-primary"></i> Aylık Randevu Grafiği</h2>
+        <canvas id="monthlyChart" height="120"></canvas>
+    </div>
+    <div class="card-glass">
+        <h2 class="card-title"><i class="fa-solid fa-chart-pie c-accent"></i> Poliklinik Yoğunluğu</h2>
+        <canvas id="deptChart" height="120"></canvas>
+    </div>
+</div>
+
+<div class="card-glass">
+    <h2 class="card-title"><i class="fa-solid fa-clock-rotate-left c-success"></i> Son Randevular</h2>
+    @if (Model.RecentAppointments.Count == 0)
+    {
+        <div class="empty-state"><i class="fa-regular fa-calendar"></i><div>Kayıt yok.</div></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data">
+                <thead><tr><th>Hasta</th><th>Doktor</th><th>Poliklinik</th><th>Tarih</th><th>Saat</th><th>Durum</th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.RecentAppointments)
+                {
+                    <tr>
+                        <td>@a.PatientName</td><td>@a.DoctorName</td><td>@a.DepartmentName</td>
+                        <td>@a.Date.ToString("dd.MM.yyyy")</td><td>@a.TimeSlot</td>
+                        <td><partial name="_StatusBadge" model="a.Status" /></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    const grid = getComputedStyle(document.documentElement).getPropertyValue('--border');
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthLabels)),
+            datasets: [{
+                label: 'Randevu', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyAppointments)),
+                borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,.12)', fill: true, tension: .4, borderWidth: 3, pointRadius: 4
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: grid } }, x: { grid: { display: false } } } }
+    });
+    new Chart(document.getElementById('deptChart'), {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentLabels)),
+            datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentLoads)),
+                backgroundColor: ['#2563EB','#06B6D4','#22C55E','#F59E0B','#EF4444','#8B5CF6'] }]
+        },
+        options: { plugins: { legend: { position: 'right' } }, cutout: '62%' }
+    });
+</script>
+}

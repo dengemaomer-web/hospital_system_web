@@ -1,0 +1,44 @@
+@model List<Prescription>
+@{
+    ViewData["Title"] = "Reçetelerim";
+    var doctors = ViewBag.Doctors as List<Doctor> ?? new List<Doctor>();
+}
+<div class="page-head">
+    <div><h1>Reçetelerim</h1><div class="crumb">Doktorlarınızın yazdığı reçeteler</div></div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card-glass"><div class="empty-state"><i class="fa-solid fa-prescription-bottle-medical"></i><div>Henüz reçeteniz yok.</div></div></div>
+}
+else
+{
+    <div class="grid grid-2">
+        @foreach (var p in Model)
+        {
+            var doc = doctors.FirstOrDefault(d => d.Id == p.DoctorId);
+            <div class="card-glass">
+                <div class="flex items-center justify-between" style="margin-bottom:14px">
+                    <div>
+                        <h2 class="card-title mb-0"><i class="fa-solid fa-prescription c-success"></i> @p.DiagnosisName</h2>
+                        <div class="text-secondary" style="font-size:.82rem;margin-top:4px">@(doc?.FullName ?? "Doktor") • @p.Date.ToLocalTime().ToString("dd.MM.yyyy")</div>
+                    </div>
+                    <button class="btn btn-sm btn-soft" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                </div>
+                <table class="data">
+                    <thead><tr><th>İlaç</th><th>Doz</th><th>Kullanım</th></tr></thead>
+                    <tbody>
+                    @foreach (var item in p.Items)
+                    {
+                        <tr><td>@item.MedicineName</td><td>@item.Dosage</td><td>@item.Usage</td></tr>
+                    }
+                    </tbody>
+                </table>
+                @if (!string.IsNullOrWhiteSpace(p.Notes))
+                {
+                    <p class="text-secondary" style="margin-top:12px;margin-bottom:0"><strong>Not:</strong> @p.Notes</p>
+                }
+            </div>
+        }
+    </div>
+}

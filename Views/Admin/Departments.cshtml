@@ -1,0 +1,41 @@
+@model List<Department>
+@{
+    ViewData["Title"] = "Poliklinik Yönetimi";
+}
+<div class="page-head">
+    <div><h1>Poliklinik Yönetimi</h1><div class="crumb">Bölümleri yönetin</div></div>
+    <button class="btn btn-primary" onclick="openModal('add-dept')"><i class="fa-solid fa-plus"></i> Poliklinik Ekle</button>
+</div>
+
+<div class="grid grid-3">
+    @foreach (var d in Model)
+    {
+        <div class="card-glass">
+            <div class="flex items-center justify-between">
+                <div class="stat-icon bg-primary-soft" style="margin-bottom:0"><i class="fa-solid @d.Icon"></i></div>
+                <form asp-action="DeleteDepartment" method="post" onsubmit="return confirm('Silinsin mi?');" style="margin:0">
+                    @Html.AntiForgeryToken()<input type="hidden" name="id" value="@d.Id" />
+                    <button class="btn btn-sm btn-ghost"><i class="fa-solid fa-trash c-danger"></i></button>
+                </form>
+            </div>
+            <h3 style="margin:14px 0 4px">@d.Name</h3>
+            <div class="text-secondary">@d.Description</div>
+        </div>
+    }
+</div>
+
+<div class="modal-overlay" id="add-dept">
+    <div class="modal-card">
+        <h3>Yeni Poliklinik</h3>
+        <form asp-action="CreateDepartment" method="post">
+            @Html.AntiForgeryToken()
+            <div class="field"><label>Ad</label><input name="name" class="form-input" required /></div>
+            <div class="field"><label>Açıklama</label><input name="description" class="form-input" /></div>
+            <div class="field"><label>İkon (Font Awesome)</label><input name="icon" class="form-input" placeholder="fa-stethoscope" /></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('add-dept')">İptal</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>

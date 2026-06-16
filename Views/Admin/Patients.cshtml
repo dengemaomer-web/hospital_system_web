@@ -1,0 +1,33 @@
+@model List<Patient>
+@{
+    ViewData["Title"] = "Hasta Yönetimi";
+}
+<div class="page-head"><div><h1>Hasta Yönetimi</h1><div class="crumb">Kayıtlı hastalar</div></div></div>
+
+<div class="card-glass">
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state"><i class="fa-solid fa-hospital-user"></i><div>Kayıtlı hasta yok.</div></div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data">
+                <thead><tr><th>Hasta</th><th>TC Kimlik</th><th>Telefon</th><th>Kan Grubu</th><th>Kayıt Tarihi</th></tr></thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    var initials = string.Join("", p.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(x => x[0]));
+                    <tr>
+                        <td><div class="list-avatar"><div class="avatar">@initials.ToUpper()</div><div class="meta"><div class="n">@p.FullName</div><div class="s">@p.Email</div></div></div></td>
+                        <td>@p.TcKimlikNo</td>
+                        <td>@(string.IsNullOrEmpty(p.Phone) ? "-" : p.Phone)</td>
+                        <td>@(string.IsNullOrEmpty(p.BloodType) ? "-" : p.BloodType)</td>
+                        <td>@p.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
